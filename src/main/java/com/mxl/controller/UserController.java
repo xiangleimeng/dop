@@ -3,7 +3,8 @@ package com.mxl.controller;
 
 import javax.validation.Valid;
 
-import com.mxl.mapper.UserMapper;
+import com.mxl.mapper.master.UserMapper;
+import com.mxl.mapper.slave.SlaveUserMapper;
 import com.mxl.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,9 @@ public class UserController {
 
 	@Autowired
 	private UserMapper userDao;
-	
+	@Autowired
+	private SlaveUserMapper slaveUserMapper;
+
 	/**
 	 * 页面跳转方法，进入新增用户页面。
 	 * 请求没有任何的参数，为什么需要定义参数表User？
@@ -60,7 +63,10 @@ public class UserController {
 		example.setAge(age);
 		
 		List<User> users = this.userDao.selectUsersByPage(example, (page-1)*size, size);
-		
+		System.out.println("主库查询数量：" + users.size());
+		List<User> users1 = this.slaveUserMapper.selectUsersByPage(example,(page-1)*size, size);
+		System.out.println("从库查询数量：" + users1.size());
+
 		model.addAttribute("list", users);
 		
 		return "queryUser";
